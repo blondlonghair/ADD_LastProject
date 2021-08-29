@@ -1,0 +1,137 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public abstract class IGun : MonoBehaviour
+{
+    protected Animator _anim;
+    protected float intervalTime;
+    protected float timer;
+
+    public abstract void Init(ref Animator anim);
+    public abstract void Shoot();
+}
+
+class Shotgun : IGun
+{
+    public override void Init(ref Animator anim)
+    {
+        _anim = anim;
+        anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Shotgun");
+        intervalTime = 1;
+        timer = 0;
+    }
+
+    public override void Shoot()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            _anim.SetTrigger("Shoot");
+        }
+    }
+}
+
+class Bayonet : IGun
+{
+    public override void Init(ref Animator anim)
+    {
+        _anim = anim;
+        anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Bayonet");
+    }
+
+    public override void Shoot()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            _anim.SetTrigger("Shoot");
+        }
+    }
+}
+
+class Pistol : IGun
+{
+    public override void Init(ref Animator anim)
+    {
+        _anim = anim;
+        anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Pistol");
+    }
+
+    public override void Shoot()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            _anim.SetTrigger("Shoot");
+        }
+    }
+}
+
+class Chainsaw : IGun
+{
+    public override void Init(ref Animator anim)
+    {
+        _anim = anim;
+        anim.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Chainsaw");
+    }
+
+    public override void Shoot()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            _anim.SetBool("Shoot", true);
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            _anim.SetBool("Shoot", false);
+        }
+    }
+}
+
+public class Gun : MonoBehaviour
+{
+    public static Animator animator;
+    public static Vector3 mousePos;
+
+    IGun gun;
+
+    void Start()
+    {
+        animator = GetComponent<Animator>();
+
+        gun = gameObject.AddComponent<IGun>();
+
+        gun.Init(ref animator);
+    }
+
+    void Update()
+    {
+        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        transform.position = new Vector3(mousePos.x, transform.position.y, 0);
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            gun = GetComponent<Bayonet>();
+            gun.Init(ref animator);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            gun = GetComponent<Shotgun>();
+            gun.Init(ref animator);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            gun = GetComponent<Pistol>();
+            gun.Init(ref animator);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            gun = GetComponent<Chainsaw>();
+            gun.Init(ref animator);
+        }
+
+        gun.Shoot();
+    }
+}
